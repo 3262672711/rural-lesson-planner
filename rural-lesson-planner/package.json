@@ -1,0 +1,16 @@
+{
+  "name": "rural-lesson-planner",
+  "version": "1.0.0",
+  "description": "农村教育教案生成工具",
+  "scripts": {
+    "serve": "uni-app-cli serve",
+    "build": "uni-app-cli build"
+  },
+  "dependencies": {
+    "vue": "^3.2.47",
+    "uview-ui": "^2.0.31"
+  },
+  "devDependencies": {
+    "@dcloudio/uni-helper-json": "^1.0.0"
+  }
+}
