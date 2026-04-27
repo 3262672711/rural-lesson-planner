@@ -1,0 +1,19 @@
+{
+  "name": "rural-lesson-planner",
+  "appid": "wx0000000000000000",
+  "description": "农村教育教案生成工具",
+  "versionName": "1.0.0",
+  "versionCode": 1,
+  "transformPx": true,
+  "app-plus": {
+    "usingComponents": true
+  },
+  "mp-weixin": {
+    "appid": "wx0000000000000000",
+    "usingComponents": true,
+    "cloudfunctionRoot": "cloudfunctions/"
+  },
+  "h5": {
+    "usingComponents": true
+  }
+}
