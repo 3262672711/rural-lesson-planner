@@ -16,7 +16,8 @@
     {
       "path": "pages/result/result",
       "style": {
-        "navigationBarTitleText": "教案结果"
+        "navigationBarTitleText": "教案结果",
+        "navigationStyle": "custom"
       }
     },
     {
