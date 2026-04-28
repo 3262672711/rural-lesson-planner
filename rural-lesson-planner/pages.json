@@ -9,7 +9,8 @@
     {
       "path": "pages/generate/generate",
       "style": {
-        "navigationBarTitleText": "生成教案"
+        "navigationBarTitleText": "新建教案",
+        "navigationStyle": "custom"
       }
     },
     {
