@@ -10,33 +10,20 @@ exports.main = async (event, context) => {
   const openid = wxContext.OPENID
 
   try {
-    // 获取请求参数
-    const { subject, grade, topic, objectives, process } = event
+    const { lessonPlan } = event
 
-    // 参数验证
-    if (!subject || !grade || !topic || !objectives || !process) {
+    if (!lessonPlan) {
       return {
         code: -1,
         data: null,
-        message: '缺少必要参数'
+        message: '缺少必要参数 lessonPlan'
       }
     }
 
-    // 构建Step1和Step2的输出
-    const step1Output = { objectives }
-    const step2Output = { process }
+    const prompt = generateSlidesPrompt(lessonPlan)
 
-    // 构建Prompt
-    const prompt = generateSlidesPrompt(step1Output, step2Output, {
-      subject,
-      grade,
-      topic
-    })
-
-    // 调用AI生成
     const result = await callLLMWithRetry(prompt, SYSTEM_PROMPT, 2)
 
-    // 验证结果
     if (!result.slides || result.slides.length === 0) {
       return {
         code: -1,

@@ -103,8 +103,23 @@ exports.main = async (event, context) => {
     const qualityReport = checkLessonPlanQuality(lessonPlan)
     console.log('质量检查结果:', qualityReport)
 
-    // Step 4: 保存到云数据库
-    console.log('Step 4: 保存到数据库...')
+    // Step 4: 调用 generateSlides 云函数生成课件大纲
+    console.log('Step 4: 生成课件大纲...')
+    const slidesResult = await callCloudFunction('generateSlides', {
+      lessonPlan
+    })
+
+    let slides = null
+    if (slidesResult.code === 0) {
+      slides = slidesResult.data.slides
+      lessonPlan.slides = slides
+      console.log('课件大纲生成成功，共', slides.length, '页')
+    } else {
+      console.warn('课件大纲生成失败:', slidesResult.message)
+    }
+
+    // Step 5: 保存到云数据库
+    console.log('Step 5: 保存到数据库...')
     try {
       const saveResult = await db.collection('generation_history').add({
         data: {
@@ -114,6 +129,7 @@ exports.main = async (event, context) => {
           textbook,
           topic,
           lesson_plan: lessonPlan,
+          slides,
           quality_score: qualityReport.score,
           quality_level: qualityReport.level,
           is_favorited: false,
@@ -124,14 +140,14 @@ exports.main = async (event, context) => {
       lessonPlan._id = saveResult._id
     } catch (dbErr) {
       console.error('保存到数据库失败:', dbErr)
-      // 不影响主流程，继续返回结果
     }
 
     return {
       code: 0,
       data: {
         lessonPlan,
-        qualityReport
+        qualityReport,
+        slides
       },
       message: 'success'
     }

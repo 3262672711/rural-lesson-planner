@@ -202,54 +202,36 @@ ${JSON.stringify(step1Output.objectives, null, 2)}
 /**
  * Step 4 - 生成课件大纲
  */
-const generateSlidesPrompt = (step1Output, step2Output, params) => {
-  const { subject, grade, topic } = params
+const generateSlidesPrompt = (lessonPlan) => {
+  return `基于以下教案，生成PPT课件大纲：
 
-  return `基于以下教学内容，设计课件大纲：
+${JSON.stringify(lessonPlan, null, 2)}
 
-【教学目标】
-${JSON.stringify(step1Output.objectives, null, 2)}
+要求：
+1. 封面页：课题名称 + 教材版本 + 年级
+2. 教学目标页：列出三维教学目标
+3. 教学过程页：按教案的每个教学环节生成1-3页
+   - 每页包含标题、要点列表（不超过5个要点）
+   - 标注建议的呈现方式（layout: title/image_text/text_list/comparison/summary）
+   - 添加教师备注（notes字段，作为演讲者备注）
+4. 练习页：展示2-3道典型练习题
+5. 总结页：本课要点回顾
+6. 作业页：展示分层作业
 
-【教学过程】
-${JSON.stringify(step2Output.process, null, 2)}
-
-【课程信息】
-- 学科：${subject}
-- 年级：${grade}
-- 课题：${topic}
-
-【输出要求】
-请严格按以下JSON格式输出，不要添加任何其他内容：
-
+请严格按以下JSON格式输出：
 {
   "slides": [
     {
       "page": 1,
-      "title": "封面页",
-      "subtitle": "${grade}${subject}",
-      "layout": "title",
-      "content": ["${topic}"],
-      "image_suggestion": "建议使用与课题相关的乡村生活图片",
-      "notes": "教学备注"
-    },
-    {
-      "page": 2,
-      "title": "情境导入",
-      "layout": "content",
-      "content": ["导入内容1", "导入内容2"],
-      "image_suggestion": "图片建议",
-      "notes": "教学备注"
+      "title": "页面标题",
+      "subtitle": "副标题（可选）",
+      "layout": "布局类型（title/image_text/text_list/comparison/summary）",
+      "content": ["要点1", "要点2", "要点3"],
+      "image_suggestion": "配图建议描述（可选）",
+      "notes": "教师备注/参考话术"
     }
   ]
-}
-
-【注意事项】
-1. 课件页数控制在8-12页
-2. layout类型：title（封面）、content（内容页）、two-column（两栏）、image（图片页）
-3. content数组每项是一个要点，不超过5个
-4. image_suggestion要具体，便于教师准备素材
-5. notes是给教师的教学提示
-6. 考虑农村学校设备条件，设计简洁实用的课件`
+}`
 }
 
 /**
