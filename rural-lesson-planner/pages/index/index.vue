@@ -22,8 +22,16 @@
       <view class="section-header">
         <text class="section-title">最近生成</text>
       </view>
+      
+      <!-- 加载中状态 -->
+      <view v-if="loading" class="loading-state">
+        <u-loading-icon size="40" color="#FF8C42"></u-loading-icon>
+        <text class="loading-text">加载中...</text>
+      </view>
+      
+      <!-- 数据列表 -->
       <scroll-view 
-        v-if="recentItems.length > 0"
+        v-else-if="recentItems.length > 0"
         scroll-x 
         class="recent-scroll"
         show-scrollbar="false"
@@ -32,7 +40,7 @@
           <view 
             class="recent-item" 
             v-for="(item, index) in recentItems" 
-            :key="index"
+            :key="item._id || index"
             @click="goToResult(item)"
           >
             <view class="item-header">
@@ -44,10 +52,12 @@
               <text class="item-grade">{{ item.grade }}</text>
             </view>
             <text class="item-topic">{{ item.topic }}</text>
-            <text class="item-time">{{ item.time }}</text>
+            <text class="item-time">{{ item.created_at }}</text>
           </view>
         </view>
       </scroll-view>
+      
+      <!-- 空状态 -->
       <u-empty 
         v-else 
         mode="data" 
@@ -74,9 +84,12 @@
 </template>
 
 <script>
+import { getHistory } from '@/utils/services.js'
+
 export default {
   data() {
     return {
+      loading: false,
       buttonStyle: {
         backgroundColor: '#FF8C42',
         borderColor: '#FF8C42',
@@ -84,30 +97,8 @@ export default {
         fontSize: '32rpx',
         borderRadius: '16rpx'
       },
-      // 最近生成的mock数据
-      recentItems: [
-        {
-          id: 1,
-          subject: '数学',
-          grade: '三年级',
-          topic: '分数的初步认识',
-          time: '2026-04-27 10:30'
-        },
-        {
-          id: 2,
-          subject: '语文',
-          grade: '五年级',
-          topic: '草船借箭',
-          time: '2026-04-26 15:20'
-        },
-        {
-          id: 3,
-          subject: '科学',
-          grade: '二年级',
-          topic: '认识植物',
-          time: '2026-04-25 09:45'
-        }
-      ],
+      // 最近生成的数据
+      recentItems: [],
       // 快速模板数据
       templates: [
         {
@@ -137,25 +128,82 @@ export default {
       ]
     }
   },
+  onShow() {
+    // 每次显示页面时加载最近生成数据
+    this.loadRecentItems()
+  },
   methods: {
+    // 加载最近生成的数据
+    async loadRecentItems() {
+      this.loading = true
+      try {
+        const result = await getHistory({ page: 1, page_size: 6 })
+        if (result && result.list) {
+          this.recentItems = result.list
+        }
+      } catch (err) {
+        console.error('加载最近生成失败:', err)
+        // 加载失败时使用mock数据
+        this.recentItems = this.getMockData()
+      } finally {
+        this.loading = false
+      }
+    },
+    
+    // 获取mock数据（用于云函数未部署时的降级处理）
+    getMockData() {
+      return [
+        {
+          _id: 'mock_001',
+          subject: '数学',
+          grade: '三年级',
+          topic: '分数的初步认识',
+          created_at: '2026-04-27 10:30',
+          is_favorited: true,
+          duration: 40
+        },
+        {
+          _id: 'mock_002',
+          subject: '语文',
+          grade: '五年级',
+          topic: '草船借箭',
+          created_at: '2026-04-26 15:20',
+          is_favorited: false,
+          duration: 45
+        },
+        {
+          _id: 'mock_003',
+          subject: '科学',
+          grade: '二年级',
+          topic: '认识植物',
+          created_at: '2026-04-25 09:45',
+          is_favorited: false,
+          duration: 35
+        }
+      ]
+    },
+    
     // 跳转到生成页
     goToGenerate() {
       uni.navigateTo({
         url: '/pages/generate/generate'
       })
     },
+    
     // 跳转到结果页
     goToResult(item) {
       uni.navigateTo({
-        url: `/pages/result/result?id=${item.id}`
+        url: `/pages/result/result?id=${item._id}`
       })
     },
+    
     // 跳转到生成页并带参数
     goToGenerateWithTemplate(template) {
       uni.navigateTo({
         url: `/pages/generate/generate?style=${template.style}`
       })
     },
+    
     // 根据学科返回标签类型
     getSubjectType(subject) {
       const typeMap = {
@@ -224,6 +272,20 @@ export default {
   font-size: 32rpx;
   font-weight: bold;
   color: #2C3E50;
+}
+
+/* 加载状态 */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60rpx 0;
+}
+
+.loading-text {
+  margin-top: 20rpx;
+  font-size: 26rpx;
+  color: #999;
 }
 
 /* 最近生成区域 */
