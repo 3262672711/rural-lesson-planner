@@ -1,12 +1,12 @@
 /**
- * Prompt模板设计
- * 面向乡村小学教师的AI备课助手
+ * Prompt模板（云函数版本）
+ * 与前端共用相同的Prompt模板
  */
 
 /**
  * 系统Prompt - 角色设定
  */
-export const SYSTEM_PROMPT = `你是一位有20年乡村小学教学经验的特级教师。你熟悉人教版、部编版、北师大版等主流教材的教学内容和编排逻辑。
+const SYSTEM_PROMPT = `你是一位有20年乡村小学教学经验的特级教师。你熟悉人教版、部编版、北师大版等主流教材的教学内容和编排逻辑。
 
 你的教学风格注重：
 1. 联系学生生活实际，用贴近乡村生活的例子辅助教学
@@ -18,10 +18,8 @@ export const SYSTEM_PROMPT = `你是一位有20年乡村小学教学经验的特
 
 /**
  * Step 1 - 生成教学目标和重难点
- * @param {object} params - 生成参数
- * @returns {string} - Prompt文本
  */
-export const generateObjectivesPrompt = (params) => {
+const generateObjectivesPrompt = (params) => {
   const { subject, grade, textbook, topic, classProfile } = params
 
   return `请为以下课程设计教学目标和重难点：
@@ -67,11 +65,8 @@ export const generateObjectivesPrompt = (params) => {
 
 /**
  * Step 2 - 设计教学过程
- * @param {object} step1Output - Step1的输出结果
- * @param {object} params - 生成参数
- * @returns {string} - Prompt文本
  */
-export const generateProcessPrompt = (step1Output, params) => {
+const generateProcessPrompt = (step1Output, params) => {
   const { classProfile, teachingStyle } = params
 
   return `基于以下教学目标和重难点，设计完整的教学过程：
@@ -147,11 +142,8 @@ ${JSON.stringify(step1Output, null, 2)}
 
 /**
  * Step 3 - 生成练习题
- * @param {object} step1Output - Step1的输出结果
- * @param {object} params - 生成参数
- * @returns {string} - Prompt文本
  */
-export const generateExercisesPrompt = (step1Output, params) => {
+const generateExercisesPrompt = (step1Output, params) => {
   const { subject, grade, topic } = params
 
   return `基于以下教学目标，设计配套练习题：
@@ -209,12 +201,8 @@ ${JSON.stringify(step1Output.objectives, null, 2)}
 
 /**
  * Step 4 - 生成课件大纲
- * @param {object} step1Output - Step1的输出结果
- * @param {object} step2Output - Step2的输出结果
- * @param {object} params - 生成参数
- * @returns {string} - Prompt文本
  */
-export const generateSlidesPrompt = (step1Output, step2Output, params) => {
+const generateSlidesPrompt = (step1Output, step2Output, params) => {
   const { subject, grade, topic } = params
 
   return `基于以下教学内容，设计课件大纲：
@@ -266,11 +254,8 @@ ${JSON.stringify(step2Output.process, null, 2)}
 
 /**
  * Step 5 - 生成知识图谱
- * @param {object} step1Output - Step1的输出结果
- * @param {object} params - 生成参数
- * @returns {string} - Prompt文本
  */
-export const generateKnowledgeGraphPrompt = (step1Output, params) => {
+const generateKnowledgeGraphPrompt = (step1Output, params) => {
   const { subject, grade, topic } = params
 
   return `基于以下教学内容，构建知识图谱：
@@ -306,7 +291,7 @@ ${JSON.stringify(step1Output.objectives, null, 2)}
 6. 知识点要具体，便于教师把握教学脉络`
 }
 
-export default {
+module.exports = {
   SYSTEM_PROMPT,
   generateObjectivesPrompt,
   generateProcessPrompt,
